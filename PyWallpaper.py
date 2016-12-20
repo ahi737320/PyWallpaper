@@ -3,7 +3,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import importlib
-from PaperAlgorithms import Circles
+from algorithms import Circles
 importlib.reload(Circles)
 from threading import Thread
 from queue import Queue
