@@ -1,7 +1,7 @@
 import cairo
 from time import sleep
 import math
-from algorithms.Helpers import hex_to_RGB
+from algorithms.Helpers import *
 import random
 
 hex_colours=[0x50514f, 0xf25f5c, 0xffe066, 0x247ba0, 0x70c1b3]
@@ -11,7 +11,6 @@ for i in range(len(colours_large)):
     colours.append((colours_large[i][0]/255., colours_large[i][1]/255., colours_large[i][2]/255.))
 
 def Circles(size, progress_queue):
-    print(colours)
     surface=cairo.ImageSurface(cairo.FORMAT_RGB24, size[0], size[1])
     cc=cairo.Context(surface)
     max_radius = min(size)//2
@@ -19,34 +18,41 @@ def Circles(size, progress_queue):
     cc.rectangle(0, 0, size[0], size[1])
     cc.fill()
     circles=[]
-    while True:
-        (x, y, radius) = create_non_intersecting_circle(0, size[0], 0, size[1], 8, max_radius, circles)
-        if radius <= 0: break
-        circles.append((x, y, radius))
-        for colour in colours[1:]:
-            cc.set_source_rgb(*colour)
-            cc.arc(x, y, radius, 0, 2*math.pi)
-            cc.fill()
-            if radius <= 16:
-                break
-            radius = random.randint(8, radius-4)
     progress_queue.put((1, surface))
 
+def Squares(size, progress_queue):
+    l_x=size[0]/10
+    l_y=size[1]/10
+    surface=cairo.ImageSurface(cairo.FORMAT_RGB24, size[0], size[1])
+    cc=cairo.Context(surface)
+    points=[]
+    for i in range(12):
+        points.append([])
+        for j in range(12):
+            points[i].append(Point(l_x*(i-1), l_y*(j-1)))
+            points[i][j].randomise(l_x/3, l_y/3)
 
-def create_non_intersecting_circle(minx, maxx, miny, maxy, minr, maxr, circles):
-    import random
+    for i in range(11):
+        for j in range(11):
+            cc.set_source_rgb(*choice(colours))
+            p1 = (points[i][j].x, points[i][j].y)
+            p2 = (points[i+1][j].x, points[i+1][j].y)
+            p3 = (points[i+1][j+1].x, points[i+1][j+1].y)
+            p4 = (points[i][j+1].x, points[i][j+1].y)
 
-    for try_index in range(0, 20):
-        x = random.randint(minx, maxx)
-        y = random.randint(miny, maxy)
-        r = random.randint(minr, maxr)
-        if not check_if_circle_intersects(x, y, r, circles):
-            return x, y, r
-    return 0, 0, 0
+            cc.new_path()
+            cc.move_to(*p1)
+            cc.line_to(*p2)
+            cc.line_to(*p3)
+            cc.line_to(*p4)
+            cc.close_path()
+            cc.fill()
 
+            lines=[(p1, p2), (p2, p3), (p3, p4), (p4, p1)]
+            for line in lines:
+                cc.new_path()
+                cc.move_to(*line[0])
+                cc.line_to(*line[1])
+                cc.stroke()
 
-def check_if_circle_intersects(x, y, r, circles):
-    for (x2, y2, r2) in circles:
-        if math.sqrt((x-x2)**2+(y-y2)**2) < (r + r2):
-            return True
-    return False
+    progress_queue.put((1, surface))

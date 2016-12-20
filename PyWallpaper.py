@@ -4,18 +4,18 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import importlib
-from algorithms.PaperAlgorithms import Circles
+from algorithms.PaperAlgorithms import Squares
 from algorithms.Helpers import *
 from threading import Thread
 from queue import Queue
 from PIL import ImageTk, Image
 
 TMP_IMAGE_LOCATION='/tmp/pywallpaper-image.png'
-generators={'Squares':0}
+generators={'Squares':Squares}
 generator_running=False
 
 def run_generator(gen_type, queue, arguments):
-    gen_thread=Thread(target=Circles, args=arguments+[queue])
+    gen_thread=Thread(target=generators[gen_type], args=arguments+[queue])
     gen_thread.start()
     generator_running=True
 
@@ -80,7 +80,7 @@ class PyWallpaper(tk.Frame):
                 self.surface=None
                 self.generate_button.configure(state=tk.DISABLED)
                 self.percentage.set(0)
-                run_generator("Circles", self.queue, [(x, y)])
+                run_generator(self.generator.selector.get(), self.queue, [(x, y)])
                 self.check_generation()
         except:
             pass
