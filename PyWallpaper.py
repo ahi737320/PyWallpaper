@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 #Python script that generates wallpapers
+
 import tkinter as tk
 import tkinter.ttk as ttk
 import importlib
 from algorithms.PaperAlgorithms import Circles
 from algorithms.Helpers import *
-importlib.reload(PaperAlgorithms)
-#importlib.reload(Helpers)
 from threading import Thread
 from queue import Queue
+from PIL import ImageTk
 
 generators={'Circles':0, 'Triangles':1}
 generator_running=False
 
 def run_generator(gen_type, queue, arguments):
     gen_thread=Thread(target=Circles, args=arguments+[queue])
-    gen_thread.run()
+    gen_thread.start()
     generator_running=True
 
 class Circle(tk.Frame):
@@ -40,6 +40,8 @@ class Generator(tk.Frame):
 class Viewer(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
+        self.image_label=tk.Label(self)
+        self.image_label.pack(expand=True, fill="both")
 
 class PyWallpaper(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -63,19 +65,26 @@ class PyWallpaper(tk.Frame):
         self.notebook.add(self.viewer, text='Viewer')
 
     def generate_image(self):
-        run_generator("Circles", self.queue, [(1920, 1080)])
-        self.after(1000, self.check_generation)
+        if not generator_running:
+            self.surface=None
+            self.generate_button.configure(state=tk.DISABLED)
+            self.percentage.set(0)
+            run_generator("Circles", self.queue, [(1920, 1080)])
+            self.check_generation()
 
     def check_generation(self):
         got_surface=False
         while not self.queue.empty():
             new_item=self.queue.get()
-            self.queue.task_done
+            self.queue.task_done()
             if new_item[0]==0: self.percentage.set(new_item[1])
             elif new_item[0]==1:
                 self.surface=new_item[1]
                 got_surface=True
         if not got_surface: self.after(1000, self.check_generation)
+        else:
+            self.generate_button.configure(state=tk.NORMAL)
+            generator_running=False
 
 def main():
     root=tk.Tk()

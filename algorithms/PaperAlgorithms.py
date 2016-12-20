@@ -1,4 +1,5 @@
 import cairo
+from time import sleep
 
 colours=[0x50514f, 0xf25f5c, 0xffe066, 0x247ba0, 0x70c1b3]
 def Circles(size, progress_queue):
@@ -10,4 +11,4 @@ def Circles(size, progress_queue):
     cc.set_source_rgb(20, 245, 200)
     cc.rectangle(300, 300, 900, 900)
     cc.fill()
-    surface.write_to_png("tester")
+    progress_queue.put((1, surface))
