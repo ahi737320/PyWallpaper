@@ -2,16 +2,22 @@
 #Python script that generates wallpapers
 import tkinter as tk
 import tkinter.ttk as ttk
-from Generators import *
+#from Generators import *
 from threading import Thread
 from queue import Queue
 
 generators={'Circles':0, 'Triangles':1}
+def tester(a, b, c, d):
+    print("HELO")
 
 def run_generator(gen_type, queue, arguments):
-    if gen_type=='Circles':
-        gen_thread=Thread(target=Circles, args=arguments+[queue])
+    #if gen_type=='Circles':
+    gen_thread=Thread(target=Circles, args=arguments+[queue])
+    #gen_thread=Thread(target=tester, args=([1, 2, 3, 4]))
     gen_thread.run()
+    print(queue.get(False))
+    queue.task_done()
+
 
 class Circle(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -39,7 +45,7 @@ class Viewer(tk.Frame):
 class PyWallpaper(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
-        self.queue=Queue
+        self.queue=Queue()
         self.parent=parent
         self.notebook=ttk.Notebook(self)
         self.notebook.grid(row=0, column=0, columnspan=2)
