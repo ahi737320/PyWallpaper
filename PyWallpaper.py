@@ -85,7 +85,6 @@ class PyWallpaper(tk.Frame):
                 got_surface=True
         if not got_surface: self.after(1000, self.check_generation)
         else: self.post_generation()
-            #self.viewer.image_label.configure(text="HELLO")#, image=ImageTk.PhotoImage(Image.open(TMP_IMAGE_LOCATION)))
 
     def post_generation(self):
         self.surface.write_to_png(TMP_IMAGE_LOCATION)
