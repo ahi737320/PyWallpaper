@@ -8,8 +8,9 @@ from algorithms.PaperAlgorithms import Circles
 from algorithms.Helpers import *
 from threading import Thread
 from queue import Queue
-from PIL import ImageTk
+from PIL import ImageTk, Image
 
+TMP_IMAGE_LOCATION='/tmp/pywallpaper-image.png'
 generators={'Circles':0, 'Triangles':1}
 generator_running=False
 
@@ -40,7 +41,7 @@ class Generator(tk.Frame):
 class Viewer(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
-        self.image_label=tk.Label(self)
+        self.image_label=tk.Label(self, text="No image")
         self.image_label.pack(expand=True, fill="both")
 
 class PyWallpaper(tk.Frame):
@@ -80,11 +81,18 @@ class PyWallpaper(tk.Frame):
             if new_item[0]==0: self.percentage.set(new_item[1])
             elif new_item[0]==1:
                 self.surface=new_item[1]
+                self.viewer.surface=self.surface
                 got_surface=True
         if not got_surface: self.after(1000, self.check_generation)
-        else:
-            self.generate_button.configure(state=tk.NORMAL)
-            generator_running=False
+        else: self.post_generation()
+            #self.viewer.image_label.configure(text="HELLO")#, image=ImageTk.PhotoImage(Image.open(TMP_IMAGE_LOCATION)))
+
+    def post_generation(self):
+        self.surface.write_to_png(TMP_IMAGE_LOCATION)
+        self.img=ImageTk.PhotoImage(Image.open(TMP_IMAGE_LOCATION).resize((300, 300), Image.ANTIALIAS))
+        self.generate_button.configure(state=tk.NORMAL)
+        self.viewer.image_label.configure(text="HAWDHALWKh", image=self.img)
+        generator_running=False
 
 def main():
     root=tk.Tk()
