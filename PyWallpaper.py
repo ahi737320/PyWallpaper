@@ -31,11 +31,13 @@ class Generator(tk.Frame):
         self.selector.grid(row=0, column=0, columnspan=4)
         self.x_label=tk.Label(self, text="x resolution:")
         self.x_label.grid(row=1, column=0)
-        self.x_res=tk.Entry(self)
+        self.x=tk.StringVar(self, "1920")
+        self.x_res=tk.Entry(self, textvariable=self.x)
         self.x_res.grid(row=1, column=1)
         self.y_label=tk.Label(self, text="y resolution:")
         self.y_label.grid(row=1, column=2)
-        self.y_res=tk.Entry(self)
+        self.y=tk.StringVar(self, "1080")
+        self.y_res=tk.Entry(self, textvariable=self.y)
         self.y_res.grid(row=1, column=3)
 
 class Viewer(tk.Frame):
@@ -66,19 +68,25 @@ class PyWallpaper(tk.Frame):
         self.notebook.add(self.viewer, text='Viewer')
 
     def generate_image(self):
-        if not generator_running:
-            self.surface=None
-            self.generate_button.configure(state=tk.DISABLED)
-            self.percentage.set(0)
-            run_generator("Circles", self.queue, [(1920, 1080)])
-            self.check_generation()
 
+        try:
+            x=int(self.generator.x.get())
+            y=int(self.generator.y.get())
+            if not generator_running:
+                self.surface=None
+                self.generate_button.configure(state=tk.DISABLED)
+                self.percentage.set(0)
+                run_generator("Circles", self.queue, [(x, y)])
+                self.check_generation()
+        except:
+            pass
     def check_generation(self):
         got_surface=False
         while not self.queue.empty():
             new_item=self.queue.get()
             self.queue.task_done()
-            if new_item[0]==0: self.percentage.set(new_item[1])
+            if new_item[0]==0:
+                self.percentage.set(new_item[1])
             elif new_item[0]==1:
                 self.surface=new_item[1]
                 self.viewer.surface=self.surface
@@ -90,7 +98,7 @@ class PyWallpaper(tk.Frame):
         self.surface.write_to_png(TMP_IMAGE_LOCATION)
         self.img=ImageTk.PhotoImage(Image.open(TMP_IMAGE_LOCATION).resize((300, 300), Image.ANTIALIAS))
         self.generate_button.configure(state=tk.NORMAL)
-        self.viewer.image_label.configure(text="HAWDHALWKh", image=self.img)
+        self.viewer.image_label.configure(text=None, image=self.img)
         generator_running=False
 
 def main():
