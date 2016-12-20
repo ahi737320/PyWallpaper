@@ -2,21 +2,19 @@
 #Python script that generates wallpapers
 import tkinter as tk
 import tkinter.ttk as ttk
-#from Generators import *
+import importlib
+from PaperAlgorithms import Circles
+importlib.reload(Circles)
 from threading import Thread
 from queue import Queue
 
 generators={'Circles':0, 'Triangles':1}
-def tester(a, b, c, d):
-    print("HELO")
+generator_running=False
 
 def run_generator(gen_type, queue, arguments):
-    #if gen_type=='Circles':
     gen_thread=Thread(target=Circles, args=arguments+[queue])
-    #gen_thread=Thread(target=tester, args=([1, 2, 3, 4]))
     gen_thread.run()
-    print(queue.get(False))
-    queue.task_done()
+    generator_running=True
 
 
 class Circle(tk.Frame):
@@ -51,6 +49,7 @@ class PyWallpaper(tk.Frame):
         self.notebook.grid(row=0, column=0, columnspan=2)
         self.generate_button=tk.Button(self, text="Generate Pattern", command=lambda: run_generator("Circles", self.queue, [(1920, 1080)]))
         self.generate_button.grid(row=1, column=0)
+        self.generate_button.configure(state=tk.NORMAL)
         self.percentage=ttk.Progressbar(self, orient="horizontal", mode="determinate")
         self.percentage.grid(row=1, column=1)
         self.generator=Generator(self.notebook)
