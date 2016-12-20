@@ -3,8 +3,10 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import importlib
-from algorithms import Circles
-importlib.reload(Circles)
+from algorithms.PaperAlgorithms import Circles
+from algorithms.Helpers import *
+importlib.reload(PaperAlgorithms)
+#importlib.reload(Helpers)
 from threading import Thread
 from queue import Queue
 
@@ -15,7 +17,6 @@ def run_generator(gen_type, queue, arguments):
     gen_thread=Thread(target=Circles, args=arguments+[queue])
     gen_thread.run()
     generator_running=True
-
 
 class Circle(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -47,22 +48,39 @@ class PyWallpaper(tk.Frame):
         self.parent=parent
         self.notebook=ttk.Notebook(self)
         self.notebook.grid(row=0, column=0, columnspan=2)
-        self.generate_button=tk.Button(self, text="Generate Pattern", command=lambda: run_generator("Circles", self.queue, [(1920, 1080)]))
+        self.generate_button=tk.Button(self, text="Generate Pattern", command=self.generate_image)
         self.generate_button.grid(row=1, column=0)
         self.generate_button.configure(state=tk.NORMAL)
-        self.percentage=ttk.Progressbar(self, orient="horizontal", mode="determinate")
-        self.percentage.grid(row=1, column=1)
+        self.percentage=tk.DoubleVar(0)
+        self.percentage_indicator=ttk.Progressbar(self, orient="horizontal", mode="determinate", variable=self.percentage)
+        self.percentage_indicator.grid(row=1, column=1)
         self.generator=Generator(self.notebook)
         self.generator.grid(row=0, column=0)
+        self.surface=None
         self.viewer=Viewer(self.notebook)
         self.viewer.grid(row=0, column=0)
         self.notebook.add(self.generator, text='Generator')
         self.notebook.add(self.viewer, text='Viewer')
 
+    def generate_image(self):
+        run_generator("Circles", self.queue, [(1920, 1080)])
+        self.after(1000, self.check_generation)
+
+    def check_generation(self):
+        got_surface=False
+        while not self.queue.empty():
+            new_item=self.queue.get()
+            self.queue.task_done
+            if new_item[0]==0: self.percentage.set(new_item[1])
+            elif new_item[0]==1:
+                self.surface=new_item[1]
+                got_surface=True
+        if not got_surface: self.after(1000, self.check_generation)
+
 def main():
     root=tk.Tk()
-    a=PyWallpaper(root)
-    a.grid()
+    app=PyWallpaper(root)
+    app.grid()
     root.mainloop()
 
 if __name__=='__main__':
