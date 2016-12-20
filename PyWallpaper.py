@@ -11,7 +11,7 @@ from queue import Queue
 from PIL import ImageTk, Image
 
 TMP_IMAGE_LOCATION='/tmp/pywallpaper-image.png'
-generators={'Circles':0, 'Triangles':1}
+generators={'Squares':0}
 generator_running=False
 
 def run_generator(gen_type, queue, arguments):
@@ -20,6 +20,10 @@ def run_generator(gen_type, queue, arguments):
     generator_running=True
 
 class Circle(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+class Squares(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
