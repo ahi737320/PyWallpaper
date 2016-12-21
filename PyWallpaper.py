@@ -27,6 +27,11 @@ class Squares(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
+class Colours(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+
 class Generator(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -68,11 +73,13 @@ class PyWallpaper(tk.Frame):
         self.surface=None
         self.viewer=Viewer(self.notebook)
         self.viewer.grid(row=0, column=0)
+        self.colours=Colours(self.notebook)
+        self.colours.grid(row=0, column=0)
         self.notebook.add(self.generator, text='Generator')
         self.notebook.add(self.viewer, text='Viewer')
+        self.notebook.add(self.colours, text='Colours')
 
     def generate_image(self):
-
         try:
             x=int(self.generator.x.get())
             y=int(self.generator.y.get())
@@ -84,6 +91,7 @@ class PyWallpaper(tk.Frame):
                 self.check_generation()
         except:
             pass
+
     def check_generation(self):
         got_surface=False
         while not self.queue.empty():
