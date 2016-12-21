@@ -4,14 +4,15 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import importlib
-from algorithms.PaperAlgorithms import Squares
+import algorithms.PaperAlgorithms as pa
 from algorithms.Helpers import *
+from algorithms.Colours import *
 from threading import Thread
 from queue import Queue
 from PIL import ImageTk, Image
 
 TMP_IMAGE_LOCATION='/tmp/pywallpaper-image.png'
-generators={'Squares':Squares}
+generators={'Circles':pa.Circles}
 generator_running=False
 
 def run_generator(gen_type, queue, arguments):
@@ -19,18 +20,34 @@ def run_generator(gen_type, queue, arguments):
     gen_thread.start()
     generator_running=True
 
-class Circle(tk.Frame):
-    def __init__(self, parent, *args, **kwargs):
-        super().__init__(parent, *args, **kwargs)
-
 class Squares(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-class Colours(tk.Frame):
+class Circles(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
+class Palette(tk.Frame):
+    def __init__(self, parent, palette, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.palette_name = tk.Label(self, text=palette[0])
+        self.palette_name.grid(row=0, column=0, sticky='news')
+        self.colours=[]
+        for i in range(len(palette[1])):
+            self.colours.append(tk.Label(self, text=palette[1][i], bg=palette[1][i]))
+            self.colours[i].grid(row=0, column=(i+1))
+        self.separator=ttk.Separator(self, orient=tk.HORIZONTAL)
+        self.separator.grid(row=1, column=0, columnspan=len(self.colours)+1, sticky='ew')
+
+class Colours(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.raw_palettes = get_palettes(20)
+        self.palettes=[]
+        for i in range(len(self.raw_palettes)):
+            self.palettes.append(Palette(self, self.raw_palettes[i]))
+            self.palettes[i].grid(row=i, column=0)
 
 class Generator(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
