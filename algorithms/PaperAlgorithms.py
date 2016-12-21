@@ -10,7 +10,7 @@ colours=[]
 for i in range(len(colours_large)):
     colours.append((colours_large[i][0]/255., colours_large[i][1]/255., colours_large[i][2]/255.))
 
-def Circles(size, progress_queue):
+def Circles(size, palette, progress_queue):
     surface=cairo.ImageSurface(cairo.FORMAT_RGB24, size[0], size[1])
     cc=cairo.Context(surface)
     max_radius = min(size)//2
