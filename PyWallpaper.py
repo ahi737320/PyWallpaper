@@ -40,14 +40,25 @@ class Palette(tk.Frame):
         self.separator=ttk.Separator(self, orient=tk.HORIZONTAL)
         self.separator.grid(row=1, column=0, columnspan=len(self.colours)+1, sticky='ew')
 
+class CustomPalette(tk.Frame):
+    def __init__(self, parent, initial_palette, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.initial_palette=initial_palette
+        self.colours=Palette(self, ["Custom", self.initial_palette])
+        self.colours.grid(row=0, column=0)
+
 class Colours(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
+        self.downloaded_palettes=tk.Frame(self)
+        self.downloaded_palettes.grid(row=0, column=0)
         self.raw_palettes = get_palettes(20)
         self.palettes=[]
         for i in range(len(self.raw_palettes)):
-            self.palettes.append(Palette(self, self.raw_palettes[i]))
+            self.palettes.append(Palette(self.downloaded_palettes, self.raw_palettes[i]))
             self.palettes[i].grid(row=i, column=0)
+        self.custom_palette = CustomPalette(self, [('#ffffff')]*6)
+        self.custom_palette.grid(row=1, column=0)
 
 class Generator(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
